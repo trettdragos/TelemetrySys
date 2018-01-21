@@ -9,6 +9,10 @@ from matplotlib import style
 import tkinter as tk
 from tkinter import ttk
 
+import os
+import time
+import string
+
 import urllib
 import json
 
@@ -20,10 +24,17 @@ style.use("ggplot")
 
 f = Figure(figsize=(10, 6), dpi=100)
 a = f.add_subplot(111)
+certainFile = time.strftime('%H:%M:%S-%d-%b-%Y')
 
 
 def animate(i):
-    pullData = open("dat.txt", "r").read()
+    ########## my part
+    fob = open(certainFile + '.txt', 'w')
+    fob.close()
+    os.system('python dataReceiver.py ' + certainFile)
+    ##########
+
+    pullData = open(certainFile+'.txt', 'r').read()
     dataList = pullData.split('\n')
     xList = []
     yList = []
@@ -96,6 +107,8 @@ class BTCe_Page(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Graph Page!", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
+
+
 
         button1 = ttk.Button(self, text="Back to Home",
                              command=lambda: controller.show_frame(StartPage))
