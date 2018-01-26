@@ -1,4 +1,5 @@
 import matplotlib
+import threading
 
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -28,11 +29,7 @@ certainFile = time.strftime('%H:%M:%S-%d-%b-%Y')
 
 
 def animate(i):
-    ########## my part
-    fob = open(certainFile + '.txt', 'w')
-    fob.close()
-    os.system('python dataReceiver.py ' + certainFile)
-    ##########
+
 
     pullData = open(certainFile+'.txt', 'r').read()
     dataList = pullData.split('\n')
@@ -97,10 +94,20 @@ class PageOne(tk.Frame):
         label = tk.Label(self, text="Page One!!!", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
+
         button1 = ttk.Button(self, text="Back to Home",
                              command=lambda: controller.show_frame(StartPage))
         button1.pack()
+def worker():
+    fob = open(certainFile + '.txt', 'w')
+    print certainFile
+    fob.close()
+    os.system('python dataReceiver.py ' + certainFile)
 
+def startRecording():
+    t = threading.Thread(name='dataCollector', target=worker)
+    t.daemon = True
+    t.start()
 
 class BTCe_Page(tk.Frame):
     def __init__(self, parent, controller):
@@ -108,12 +115,12 @@ class BTCe_Page(tk.Frame):
         label = tk.Label(self, text="Graph Page!", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
-
-
-        button1 = ttk.Button(self, text="Back to Home",
-                             command=lambda: controller.show_frame(StartPage))
-        button1.pack()
-
+        ########## my part
+        #fob = open(certainFile + '.txt', 'w')
+        #fob.close()
+        #os.system('python dataReceiver.py ' + certainFile)
+        ##########
+        startRecording()
         canvas = FigureCanvasTkAgg(f, self)
         canvas.show()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)

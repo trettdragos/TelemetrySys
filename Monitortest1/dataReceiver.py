@@ -15,7 +15,7 @@ a,b,c,d,e=newFile.split("'")
 newFile = d+".txt"
 while 1:
     temp = ser.readline()
-    print temp
+    #print temp
     if (temp):
         fob = open(newFile, "a")
         fob.write(temp)

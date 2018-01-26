@@ -1,8 +1,17 @@
-import serial
+import threading
 import time
-import htmlPy
-ser = serial.Serial('/dev/ttyACM0', 9600)
-temp = ser.readline()
-timeNow = time.strftime('%H:%M:%S-%d-%b-%Y')
-fob = open(timeNow+'.txt', 'a')
-fob.close()
+
+def worker():
+    print threading.currentThread().getName(), 'Starting1'
+    time.sleep(2)
+    print threading.currentThread().getName(), 'Exiting1'
+
+def my_service():
+    print threading.currentThread().getName(), 'Starting2'
+    time.sleep(3)
+    print threading.currentThread().getName(), 'Exiting2'
+
+t = threading.Thread(name='my_service', target=my_service)
+w = threading.Thread(name='worker', target=worker)
+w.start()
+t.start()
