@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="dataAnalitics:jar">
+    <output-path>$USER_HOME$/Desktop</output-path>
+    <root id="archive" name="dataAnalitics.jar">
+      <element id="module-output" name="dataAnalitics" />
+    </root>
+  </artifact>
+</component>
