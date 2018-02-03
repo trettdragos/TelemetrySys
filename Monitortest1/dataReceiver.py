@@ -6,17 +6,22 @@ import sys
 ser = serial.Serial('/dev/ttyACM0', 9600)
 ser.close()
 ser.open()
-
-for i in range(0, 30):
+print "securing data acuracy for 3 sec..."
+for i in range(0, 29):
     temp = ser.readline()
-timeNow = sys.argv
-newFile = "" + str(timeNow)
-a,b,c,d,e=newFile.split("'")
-newFile = d+".txt"
+timeNow = str(time.strftime('%H-%M-%S-%d-%m-%Y'))+".txt"
+#timeNow = sys.argv
+#newFile = "" + str(timeNow)
+#a,b,c,d,e=newFile.split("'")
+newFile = os.path.join("db", timeNow)
+print "writing in file: "+newFile
 while 1:
     temp = ser.readline()
     #print temp
     if (temp):
-        fob = open(newFile, "a")
+        data,time = temp.split(",")
+	print "temperature: "+data+" time: "+str(float(time)/10)+"s"
+	#print temp
+	fob = open(newFile, "a")
         fob.write(temp)
         fob.close()
