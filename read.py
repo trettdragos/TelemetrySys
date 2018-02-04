@@ -4,6 +4,8 @@ import SimpleMFRC522
 import sys
 import MySQLdb
 
+time.sleep(60)
+
 db = MySQLdb.connect(host="localhost",
                      user="root",
                      passwd="password",
@@ -53,6 +55,12 @@ def isIDInDatabase(id):
         if(cur.rowcount>0):
                 timeNow = time.strftime('%H:%M:%S')
                 cur.execute("SELECT * FROM prezente WHERE UID = %s ORDER BY ID DESC", (id))
+                if(cur.rowcount==0):
+                        print "insering new entry with current time..."
+                        cursor = db.cursor()
+                        cursor.execute("INSERT INTO prezente (UID, intrare, iesire) VALUES (%s, %s, %s)", (id, timeNow, timeNow))
+                        db.commit()
+                        return True
                 for row in cur.fetchall() :
                         if(row[2]==row[3]):
                                 print "updating entry with exit time..."
