@@ -1,14 +1,11 @@
-import serial
+import serial as serial
 import time
 import os
 import sys
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('COM8', 9600)
 ser.close()
 ser.open()
-print "securing data acuracy for 3 sec..."
-for i in range(0, 29):
-    temp = ser.readline()
 timeNow = str(time.strftime('%H-%M-%S-%d-%m-%Y'))+".txt"
 #timeNow = sys.argv
 #newFile = "" + str(timeNow)
@@ -19,9 +16,9 @@ while 1:
     temp = ser.readline()
     #print temp
     if (temp):
-        data,time = temp.split(",")
-	print "temperature: "+data+" time: "+str(float(time)/10)+"s"
-	#print temp
-	fob = open(newFile, "a")
+        time, tempMotor, tempBatery, dump = temp.split(";")
+        print "Motor: "+tempMotor+ " - Batery: "+ tempBatery +" time: "+str(float(time)/10)+"s"
+        temp = temp[:-1]
+        fob = open(newFile, "a")
         fob.write(temp)
         fob.close()
