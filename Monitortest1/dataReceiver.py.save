@@ -13,8 +13,7 @@ timeNow = str(time.strftime('%H-%M-%S-%d-%m-%Y'))+".txt"
 #timeNow = sys.argv
 #newFile = "" + str(timeNow)
 #a,b,c,d,e=newFile.split("'")
-newFile = 
-"""\db\"""+timeNow
+newFile = """\db\"""+timeNow
 print "writing in file: "+newFile
 while 1:
     temp = ser.readline()
