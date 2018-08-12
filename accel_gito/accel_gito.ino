@@ -1,4 +1,6 @@
 #include <Wire.h>
+
+
 #include <TimerOne.h>
 #include "LiquidCrystal.h"
 
@@ -59,7 +61,7 @@ void setup()
    lcd.begin(16, 2);
 
   lcd.setBacklight(HIGH);
-  pinMode(12, INPUT);
+  pinMode(2, INPUT);
   
   // Set accelerometers low pass filter at 5Hz
   I2CwriteByte(MPU9250_ADDRESS,29,0x06);
@@ -77,7 +79,6 @@ void setup()
   // Request continuous magnetometer measurements in 16 bits
   I2CwriteByte(MAG_ADDRESS,0x0A,0x16);
   
-   pinMode(13, OUTPUT);
   Timer1.initialize(10000);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(callback);  // attaches callback() as a timer overflow interrupt
   
@@ -96,7 +97,6 @@ long int cpt=0;
 void callback()
 { 
   intFlag=true;
-  digitalWrite(13, digitalRead(13) ^ 1);
 }
 
 // Main loop, read and display data
@@ -128,27 +128,27 @@ void loop()
     // Display values
   
   // Accelerometer
-  /*Serial.print (ax,DEC); 
+  Serial.print (ax,DEC); 
   Serial.print ("\t");
   Serial.print (ay,DEC);
   Serial.print ("\t");
    
   // Gyroscope
-  Serial.print (gx,DEC); 
+  /*Serial.print (gx,DEC); 
   Serial.print ("\t");
   Serial.print (gy,DEC);
   Serial.print ("\t");
   Serial.print (gz,DEC);  
-  Serial.print ("\t");
+  Serial.print ("\t");*/
 
   
   
   // End of line
-  Serial.println("");*/
+  Serial.println("");
   lcd.clear();
   lcd.setCursor(1, 0);
   lcd.print(ax, DEC);
   lcd.setCursor(0,1);
-  lcd.print(digitalRead(12));
+  lcd.print(digitalRead(2));
   delay(10);    
 }
