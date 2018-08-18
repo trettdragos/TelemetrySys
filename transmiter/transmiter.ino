@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include <RF24.h>
 #include <Wire.h>
+#include "LiquidCrystal.h"
 
 RF24 radio(7, 8); // CE, CSN
 
@@ -35,6 +36,9 @@ int val2 = 0;
 int rev;
 int rpm;
 int last_time;
+int update_lcd;
+
+LiquidCrystal lcd(0);
 
 void setup() {
   radio.begin();
@@ -45,6 +49,8 @@ void setup() {
   radio.stopListening();
   Serial.begin(9600);
   Wire.begin();
+  lcd.begin(16, 2);
+  lcd.setBacklight(HIGH);
   setupMPU();
   pinMode(voltagePin1, INPUT);
   pinMode(voltagePin2, INPUT);
@@ -98,6 +104,10 @@ void loop() {
   textBatery1.remove(5);
   String textBatery2 = String(TB2, HEX);
   textBatery2.remove(5);
+  if(Vin1<0.9)
+    Vin1 = 0.0;
+  if(Vin2<0.9)
+    Vin2 = 0.0;
   String textBateryVoltage1 = String(Vin1, HEX);
   textBateryVoltage1.remove(5);
   String textBateryVoltage2 = String(Vin2, HEX);
@@ -109,6 +119,22 @@ void loop() {
   textGFY.remove(5);
   toSendA ="A:"+ textCount +";"+ textMotor +";"+ textBatery1 +";" + textBatery2 + ";";
   toSendB ="B:"+ textBateryVoltage1 + ";" + textBateryVoltage2 + ";" + textRPM + ";" + textGFX + ";" + textGFY +";";
+  if(millis() - update_lcd >= 1000){
+    lcd.clear();
+     textBatery1.remove(4);
+      textBatery2.remove(4);
+      textMotor.remove(4);
+      lcd.setCursor(0, 0);
+      String toLCD = "M"+textMotor+" B"+textBatery1+" "+textBatery2;
+      lcd.print(toLCD);
+      lcd.setCursor(0, 1);
+      textBateryVoltage1.remove(4);
+      textBateryVoltage2.remove(4);
+      textRPM = "999";
+      toLCD = "M"+textRPM+" VB"+textBateryVoltage1+" "+textBateryVoltage2;
+      lcd.print(toLCD);
+      update_lcd = millis();
+  }
   Serial.println(toSendA+toSendB);
   toSendA.toCharArray(sending, toSendA.length()+1);
   radio.write(&sending, sizeof(sending));
