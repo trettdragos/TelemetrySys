@@ -120,7 +120,6 @@ void loop() {
   toSendA ="A:"+ textCount +";"+ textMotor +";"+ textBatery1 +";" + textBatery2 + ";";
   toSendB ="B:"+ textBateryVoltage1 + ";" + textBateryVoltage2 + ";" + textRPM + ";" + textGFX + ";" + textGFY +";";
   if(millis() - update_lcd >= 1000){
-    lcd.clear();
      textBatery1.remove(4);
       textBatery2.remove(4);
       textMotor.remove(4);
