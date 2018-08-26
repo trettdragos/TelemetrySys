@@ -9,6 +9,7 @@
 RF24 radio(7, 8); // CE, CSN
 TinyGPSPlus gps;
 SoftwareSerial ss(10, 11);
+static const uint32_t GPSBaud = 9600;
 const byte address[6] = "00001";
 int count = 0;
 
@@ -43,9 +44,9 @@ int last_time;
 int update_lcd;
 
 LiquidCrystal lcd(0);
-
+String textGPS = "C:;;;";
 void setup() {
-  ss.begin(9600);
+  
   radio.begin();
   radio.openWritingPipe(address);
   radio.setPALevel(RF24_PA_MAX);
@@ -53,6 +54,7 @@ void setup() {
   attachInterrupt(0, oneSpin, FALLING);
   radio.stopListening();
   Serial.begin(9600);
+  ss.begin(GPSBaud);
   Wire.begin();
   lcd.begin(16, 2);
   lcd.setBacklight(HIGH);
@@ -66,6 +68,19 @@ String toSendA = "";
 String toSendB = "";
 
 void loop() {
+  while (ss.available() > 0){
+    gps.encode(ss.read());
+    if (gps.location.isUpdated()){
+      
+      String textLat = String(gps.location.lat(), HEX);
+      textLat.remove(10);
+      String textLng = String(gps.location.lng(), HEX);
+      textLng.remove(10);
+      String speedKMH = String(gps.speed.kmph(), HEX);
+      speedKMH.remove(10);
+      textGPS = "C:"+textLat+";"+textLng+";"+speedKMH+";"; 
+    }
+  }
   count = millis()/100;
   //accel
   recordAccelRegisters();
@@ -122,20 +137,6 @@ void loop() {
   textGFX.remove(5);
   String textGFY = String(gForceY, HEX);
   textGFY.remove(5);
-  String textGPS = "C:;;;";
-  if (ss.available() > 0){
-    gps.encode(ss.read());
-    if (gps.location.isUpdated()){
-      
-      String textLat = String(gps.location.lat(), HEX);
-      textLat.remove(10);
-      String textLng = String(gps.location.lng(), HEX);
-      textLng.remove(10);
-      String speedKMH = String(gps.speed.kmph(), HEX);
-      speedKMH.remove(10);
-      textGPS = "C:"+textLat+";"+textLng+";"+speedKMH+";"; 
-    }
-  }
   toSendA ="A:"+ textCount +";"+ textMotor +";"+ textBatery1 +";" + textBatery2 + ";";
   toSendB ="B:"+ textBateryVoltage1 + ";" + textBateryVoltage2 + ";" + textRPM + ";" + textGFX + ";" + textGFY +";";
   if(millis() - update_lcd >= 1000){
