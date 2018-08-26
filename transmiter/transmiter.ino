@@ -2,9 +2,13 @@
 #include <RF24.h>
 #include <Wire.h>
 #include "LiquidCrystal.h"
+#include <TinyGPS++.h>
+#include <SoftwareSerial.h>
+#include <TimedAction.h>
 
 RF24 radio(7, 8); // CE, CSN
-
+TinyGPSPlus gps;
+SoftwareSerial ss(10, 11);
 const byte address[6] = "00001";
 int count = 0;
 
@@ -41,6 +45,7 @@ int update_lcd;
 LiquidCrystal lcd(0);
 
 void setup() {
+  ss.begin(9600);
   radio.begin();
   radio.openWritingPipe(address);
   radio.setPALevel(RF24_PA_MAX);
@@ -117,6 +122,20 @@ void loop() {
   textGFX.remove(5);
   String textGFY = String(gForceY, HEX);
   textGFY.remove(5);
+  String textGPS = "C:;;;";
+  if (ss.available() > 0){
+    gps.encode(ss.read());
+    if (gps.location.isUpdated()){
+      
+      String textLat = String(gps.location.lat(), HEX);
+      textLat.remove(10);
+      String textLng = String(gps.location.lng(), HEX);
+      textLng.remove(10);
+      String speedKMH = String(gps.speed.kmph(), HEX);
+      speedKMH.remove(10);
+      textGPS = "C:"+textLat+";"+textLng+";"+speedKMH+";"; 
+    }
+  }
   toSendA ="A:"+ textCount +";"+ textMotor +";"+ textBatery1 +";" + textBatery2 + ";";
   toSendB ="B:"+ textBateryVoltage1 + ";" + textBateryVoltage2 + ";" + textRPM + ";" + textGFX + ";" + textGFY +";";
   if(millis() - update_lcd >= 1000){
@@ -134,11 +153,14 @@ void loop() {
       lcd.print(toLCD);
       update_lcd = millis();
   }
-  Serial.println(toSendA+toSendB);
+  Serial.println(toSendA+toSendB+textGPS);
   toSendA.toCharArray(sending, toSendA.length()+1);
   radio.write(&sending, sizeof(sending));
   toSendB.toCharArray(sending, toSendB.length()+1);
-  delay(50);
+  delay(25);
+  radio.write(&sending, sizeof(sending));
+  delay(25);
+  textGPS.toCharArray(sending, textGPS.length()+1);
   radio.write(&sending, sizeof(sending));
   delay(50);
 }

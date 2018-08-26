@@ -12,6 +12,7 @@ void setup() {
 
 String A = String("");
 String B = String("");
+String C = String("");
 
 void loop() {
   if (radio.available()) {
@@ -24,13 +25,16 @@ void loop() {
     String test = String(res);
     if(str[0] == 'A'){
       A = test;
-    }else if(str == 'B'){
+    }else if(str[0] == 'B'){
       B = test;
+    }else if(str[0] == 'C'){
+      C = test;
     }
-    if(!A.equals("") && !B.equals("")){
-      Serial.println(A+B);
+    if(!A.equals("") && !B.equals("") && !C.equals("")){
+      Serial.println(A+B+C);
       A = "";
       B = "";
+      C = "";
     }
   }
 }
